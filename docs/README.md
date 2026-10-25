@@ -23,9 +23,15 @@ This directory contains the Shed-Z foundation package. The documents describe a 
 - `14-addon-features.md` — add-on feature catalog
 - `15-addon-specifications.md` — minimum behavior, non-goals and readiness evidence for add-ons
 
+## Preparation and resource planning
+
+- `16-workload-inventory.md` — candidate first jobs, impact classification and acceptance criteria
+- `17-available-resource-inventory.md` — observed capabilities, user-reported constraints and unknowns
+- `18-cost-and-capacity-model.md` — spending approval, benchmark approach, caps and cost formulas
+
 ## Reading order
 
-Start with 01 and 02, then 09, 03 and 04. Read 05–07 for operating, measurement and decision contracts; then 11–15 for system boundaries and feature specs. Use 08 to plan work and 10 as the release gate.
+Start with 01 and 02, then 09, 03 and 04. Read 05–07 for operating, measurement and decision contracts; then 11–15 for system boundaries and feature specs. Use 16–18 to prepare the first pilot, 08 to sequence work and 10 as the release gate.
 
 ## Validation
 
@@ -34,3 +40,6 @@ From the repository root, run `python scripts/check_docs.py`. This checks local 
 ## Status
 
 All architecture and add-on descriptions are proposed specifications until their implementation and required verification artifacts exist. Keep documented findings, decisions, tests and deployment claims separate.
+
+
+Phase 0 is still open until the owner confirms representative jobs, the intended host/network facts, a spending ceiling and measurable acceptance criteria.
