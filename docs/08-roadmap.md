@@ -10,6 +10,7 @@ The roadmap advances only when the prior phase's exit criteria are met. Dates ar
 - [x] Record unresolved choices rather than silently selecting a stack.
 - [x] Define the full agent roster and stateful services.
 - [x] Define the durable state model and secure instruction governance.
+- [x] Define the add-on feature catalog and specifications.
 - [ ] Add a real workload inventory and impact classification.
 - [ ] Record available host/network constraints and an operating-cost ceiling.
 
