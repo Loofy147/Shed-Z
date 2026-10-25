@@ -1,22 +1,36 @@
 # Documentation index
 
-This directory contains the Shed-Z foundation package.
+This directory contains the Shed-Z foundation package. The documents describe a proposed system; they are not evidence that its runtime, controls or services have been implemented.
 
-## Files
-- `01-research-findings.md` — the research base and claim status
-- `03-reference-architecture.md` — the proposed layered architecture
-- `04-threat-model.md` — assets, boundaries, threats, and required controls
-- `08-roadmap.md` — the evidence-gated implementation plan
-- `09-source-register.md` — the source inventory and usage policy
-- `10-production-readiness.md` — the readiness checklist and evidence gate
-- `11-agent-roster.md` — the control agents, coding agents, and stateful services
-- `12-durable-state-model.md` — the durable state objects and immutability rules
-- `13-instruction-governance.md` — the secure, evolving instruction strategy
-- `14-addon-features.md` — the add-on feature catalog
-- `15-addon-specifications.md` — the minimum behavior and evidence expectations
+## Research and design
 
-## How to read this package
-Start with the research and source register, then read the architecture and threat model, then the agent roster and durable-state model, then the instruction-governance policy, then the add-on feature catalog and specifications, then the roadmap, and finally the readiness checklist.
+- `01-research-findings.md` — findings, claim statuses and limits of the initial investigation
+- `02-scope-and-terminology.md` — definition, scope, non-goals and vocabulary
+- `03-reference-architecture.md` — layered architecture and component boundaries
+- `04-threat-model.md` — assets, trust boundaries, threats and required controls
+- `05-operating-model.md` — task lifecycle, authorization, retry and recovery rules
+- `06-observability-and-validation.md` — metrics, verification-independence scale and validation plan
+- `07-decision-records.md` — initial ADR register and open architecture decisions
+- `08-roadmap.md` — evidence-gated implementation plan
+- `09-source-register.md` — sources, dates, uses, limitations and source-quality policy
+- `10-production-readiness.md` — release gate and required evidence bundle
+
+## System and feature contracts
+
+- `11-agent-roster.md` — control roles, coding roles and stateful services
+- `12-durable-state-model.md` — durable state objects and immutability rules
+- `13-instruction-governance.md` — secure, versioned instruction strategy
+- `14-addon-features.md` — add-on feature catalog
+- `15-addon-specifications.md` — minimum behavior, non-goals and readiness evidence for add-ons
+
+## Reading order
+
+Start with 01 and 02, then 09, 03 and 04. Read 05–07 for operating, measurement and decision contracts; then 11–15 for system boundaries and feature specs. Use 08 to plan work and 10 as the release gate.
+
+## Validation
+
+From the repository root, run `python scripts/check_docs.py`. This checks local Markdown link targets and ensures source IDs in the research findings exist in the source register. It does not verify external URLs, the accuracy of a claim, or implementation state.
 
 ## Status
-These documents define the foundation only. They are not proof of production readiness or deployment completion.
+
+All architecture and add-on descriptions are proposed specifications until their implementation and required verification artifacts exist. Keep documented findings, decisions, tests and deployment claims separate.
