@@ -12,6 +12,7 @@ Shed-Z is an evidence-gated foundation for an always-on, privately reachable age
 - Full agent roster and stateful services
 - Durable state model for safe recovery
 - Secure instruction-governance strategy
+- Add-on feature catalog and specifications
 - Roadmap with evidence gates
 - Production-readiness checklist
 
@@ -23,6 +24,8 @@ The repository now defines the full control plane for the project:
 - `docs/11-agent-roster.md` — the control agents, coding agents, and stateful services
 - `docs/12-durable-state-model.md` — the durable state objects and immutability rules
 - `docs/13-instruction-governance.md` — the secure, evolving instruction strategy
+- `docs/14-addon-features.md` — the add-on feature catalog
+- `docs/15-addon-specifications.md` — the minimum behavior and evidence expectations
 
 ## Reading order
 1. `docs/01-research-findings.md`
@@ -32,8 +35,10 @@ The repository now defines the full control plane for the project:
 5. `docs/11-agent-roster.md`
 6. `docs/12-durable-state-model.md`
 7. `docs/13-instruction-governance.md`
-8. `docs/08-roadmap.md`
-9. `docs/10-production-readiness.md`
+8. `docs/14-addon-features.md`
+9. `docs/15-addon-specifications.md`
+10. `docs/08-roadmap.md`
+11. `docs/10-production-readiness.md`
 
 ## Safety posture
 - Least privilege and private-only access
