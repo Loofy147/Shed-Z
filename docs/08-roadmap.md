@@ -8,6 +8,8 @@ The roadmap advances only when the prior phase's exit criteria are met. Dates ar
 - [x] Research the original usage, Herdr capabilities, Tailscale controls and agent-security guidance.
 - [x] Create the reference architecture, threat model, operating contract and validation plan.
 - [x] Record unresolved choices rather than silently selecting a stack.
+- [x] Define the full agent roster and stateful services.
+- [x] Define the durable state model and secure instruction governance.
 - [ ] Add a real workload inventory and impact classification.
 - [ ] Record available host/network constraints and an operating-cost ceiling.
 
