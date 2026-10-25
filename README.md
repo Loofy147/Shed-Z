@@ -24,6 +24,16 @@ Shed-Z is an evidence-gated foundation for an always-on, privately reachable age
 
 Remote access leads to a policy gate, then a durable task store and scheduler, then an isolated worker, then a session manager (Herdr as a candidate), then the agent runtime, tools, model inference, external systems, and audit/backup.
 
+## Availability-first preparation
+
+The available resources are the centre of gravity. Use verified existing capabilities first; do not assume new hardware, a paid VM, a local model, a new scheduler or extra subscriptions are required. The preparation package is:
+
+- `docs/16-workload-inventory.md` — candidate jobs and acceptance criteria
+- `docs/17-available-resource-inventory.md` — observed resources, user-reported constraints and unknowns
+- `docs/18-cost-and-capacity-model.md` — cost formulae, capacity caps and budget approval record
+
+These files prepare the decision; they do not claim the target host, private network, provider entitlements or budget are verified. Phase 0 remains open until those facts and the first jobs are confirmed.
+
 ## Project control plane
 
 The repository defines the proposed control plane across:
@@ -48,13 +58,16 @@ These are specifications and role contracts, not claims that separate agents or 
 6. `docs/05-operating-model.md`
 7. `docs/06-observability-and-validation.md`
 8. `docs/07-decision-records.md`
-9. `docs/11-agent-roster.md`
-10. `docs/12-durable-state-model.md`
-11. `docs/13-instruction-governance.md`
-12. `docs/14-addon-features.md`
-13. `docs/15-addon-specifications.md`
-14. `docs/08-roadmap.md`
-15. `docs/10-production-readiness.md`
+9. `docs/16-workload-inventory.md`
+10. `docs/17-available-resource-inventory.md`
+11. `docs/18-cost-and-capacity-model.md`
+12. `docs/11-agent-roster.md`
+13. `docs/12-durable-state-model.md`
+14. `docs/13-instruction-governance.md`
+15. `docs/14-addon-features.md`
+16. `docs/15-addon-specifications.md`
+17. `docs/08-roadmap.md`
+18. `docs/10-production-readiness.md`
 
 ## Validate documentation
 
