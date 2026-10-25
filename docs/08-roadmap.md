@@ -11,10 +11,18 @@ The roadmap advances only when the prior phase's exit criteria are met. Dates ar
 - [x] Define the full agent roster and stateful services.
 - [x] Define the durable state model and secure instruction governance.
 - [x] Define the add-on feature catalog and specifications.
-- [ ] Add a real workload inventory and impact classification.
-- [ ] Record available host/network constraints and an operating-cost ceiling.
+- [x] Add candidate workloads and a risk/impact classification scheme in `16-workload-inventory.md`.
+- [x] Inventory currently visible resources and preserve unverified constraints as UNKNOWN in `17-available-resource-inventory.md`.
+- [x] Define cost, capacity and approval controls in `18-cost-and-capacity-model.md`.
+- [ ] Owner confirms the first two real jobs, output expectations and failure boundaries.
+- [ ] Inspect the actual candidate host, operating system, memory, disk, GPU if present, uptime and recovery access.
+- [ ] Inspect actual remote-access/Tailscale status and access policies before relying on private connectivity.
+- [ ] Record an owner-approved monthly incremental spend ceiling and one-time purchase ceiling, even if the approved values are zero.
+- [ ] Choose acceptance thresholds for the first job set and record the evidence destination.
 
-**Exit gate:** the owner accepts the first two real jobs, non-goals and safety boundary; no runtime is installed just to make the concept feel concrete.
+**Exit gate:** the owner accepts the first two jobs and their safety boundary; the target host and network are identified; the spending ceiling is explicit; acceptance criteria and evidence capture are defined. No runtime is installed just to make the concept feel concrete.
+
+The repository has templates for these inputs, but templates are not evidence that the inputs are complete. Phase 0 remains open until the unchecked owner/environment inputs are supported by evidence.
 
 ## Phase 1 — Safe host and remote-access lab
 
