@@ -13,6 +13,7 @@ Prepare the configuration boundaries before a computer exists. This pack defines
 - `config/action-policy.json` — action-level baseline. Unknown actions, external effects and high-impact capabilities are denied or require explicit approval.
 - `config/job-catalog.json` — candidate jobs and acceptance criteria. All Shed-Z runtime jobs are explicitly disabled; a separate `enabled` field is required for a later reviewed promotion.
 - `scripts/validate_preconfiguration.py` — offline checks for configuration integrity and safe defaults.
+- `tests/test_preconfiguration.py` — regression tests that prove unsafe promotion, policy weakening, early job enablement, public ingress and secret-value configuration are rejected.
 - `scripts/check_docs.py` — existing document link and research source-reference check.
 
 ## Non-negotiable defaults
@@ -33,6 +34,7 @@ The validation script uses only Python's standard library. It can be run in CI:
 
 ```sh
 python scripts/validate_preconfiguration.py
+python -m unittest discover -s tests -v
 python scripts/check_docs.py
 ```
 
