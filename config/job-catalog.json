@@ -23,7 +23,8 @@
         "does_not_validate_external_urls",
         "does_not_prove_claim_truth",
         "does_not_test_runtime_security"
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": "J-002",
@@ -52,7 +53,8 @@
         "pinned_ref",
         "task_brief",
         "acceptance_criteria"
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": "J-003",
@@ -84,7 +86,8 @@
         "bounded_change_request",
         "test_command_allowlist",
         "resource_limits"
-      ]
+      ],
+      "enabled": false
     }
   ]
 }
