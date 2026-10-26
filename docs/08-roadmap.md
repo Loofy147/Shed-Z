@@ -14,6 +14,7 @@ The roadmap advances only when the prior phase's exit criteria are met. Dates ar
 - [x] Add candidate workloads and a risk/impact classification scheme in `16-workload-inventory.md`.
 - [x] Inventory currently visible resources and preserve unverified constraints as UNKNOWN in `17-available-resource-inventory.md`.
 - [x] Define cost, capacity and approval controls in `18-cost-and-capacity-model.md`.
+- [x] Prepare a deployment-disabled config, fail-closed action policy, disabled job catalog and offline validator in `19-preconfiguration.md` and `config/`.
 - [ ] Owner confirms the first two real jobs, output expectations and failure boundaries.
 - [ ] Inspect the actual candidate host, operating system, memory, disk, GPU if present, uptime and recovery access.
 - [ ] Inspect actual remote-access/Tailscale status and access policies before relying on private connectivity.
