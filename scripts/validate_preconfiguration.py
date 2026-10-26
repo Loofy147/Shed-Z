@@ -93,6 +93,8 @@ def validate() -> list[str]:
         if nonempty(job_id):
             job_ids.append(job_id)
         require(job.get("enabled_by_default") is False, f"job {job_id!r} must be disabled by default", errors)
+        if cfg.get("deployment_enabled") is not True or cfg.get("execution", {}).get("enabled") is not True:
+            require(job.get("enabled") is False, f"job {job_id!r} must remain disabled until runtime promotion", errors)
         require(nonempty(job.get("name")), f"job {job_id!r} must have a name", errors)
         require(bool(job.get("acceptance")), f"job {job_id!r} must have acceptance criteria", errors)
     require(len(job_ids) == len(set(job_ids)), "job catalog contains duplicate job IDs", errors)
@@ -127,7 +129,7 @@ def validate() -> list[str]:
         require(observability.get("independent_audit_sink_configured") is True, "promoting requires an independent audit sink", errors)
         require(recovery.get("backup_configured") is True and recovery.get("restore_tested") is True, "promoting requires configured and tested backup/restore", errors)
         require(recovery.get("independent_stop_control_configured") is True, "promoting requires an independent stop control", errors)
-        require(any(isinstance(job, dict) and job.get("enabled_by_default") is True for job in jobs), "promoting requires at least one explicitly enabled and specified job", errors)
+        require(any(isinstance(job, dict) and job.get("enabled") is True for job in jobs), "promoting requires at least one explicitly enabled and specified job", errors)
 
     # Fail closed if obvious secret-value fields are introduced into tracked JSON.
     secret_key_fragments = {"api_key", "secret_value", "password_value", "token_value", "private_key_value"}
