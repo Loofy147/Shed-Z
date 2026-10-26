@@ -36,6 +36,7 @@ This directory contains the Shed-Z foundation package. The documents describe a 
 - `../config/action-policy.json` — deny-by-default action policy
 - `../config/job-catalog.json` — candidate jobs, explicitly disabled by default
 - `../scripts/validate_preconfiguration.py` — offline guardrail validation
+- `../tests/test_preconfiguration.py` — regression tests for unsafe promotion, policy weakening, early job enablement, public ingress and secret-value detection
 
 ## Reading order
 
@@ -43,7 +44,7 @@ Start with 01 and 02, then 09, 03 and 04. Read 05–07 for operating, measuremen
 
 ## Validation
 
-From the repository root, run `python scripts/check_docs.py` and `python scripts/validate_preconfiguration.py`. The first checks local Markdown links and research source IDs. The second checks configuration integrity and safe preconfiguration defaults. Neither verifies external URLs, proves research claims, or tests a deployed runtime.
+From the repository root, run `python scripts/check_docs.py`, `python scripts/validate_preconfiguration.py` and `python -m unittest discover -s tests -v`. The first checks local Markdown links and research source IDs. The second checks configuration integrity and safe preconfiguration defaults. Neither verifies external URLs, proves research claims, or tests a deployed runtime.
 
 ## Status
 
