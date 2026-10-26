@@ -19,7 +19,7 @@ Shed-Z is an evidence-gated foundation for an always-on, privately reachable age
 - Secure instruction-governance strategy
 - Add-on feature catalog and specifications
 - Machine-independent preconfiguration, fail-closed action policy and disabled job catalog
-- Offline preconfiguration validator plus documentation validation CI
+- Offline preconfiguration validator, regression tests and documentation validation CI
 
 ## Core logic in one sentence
 
@@ -75,7 +75,7 @@ These are specifications and role contracts, not claims that separate agents or 
 
 ## Validate documentation
 
-Run `python scripts/check_docs.py` and `python scripts/validate_preconfiguration.py` locally. GitHub Actions runs both on pull requests and pushes to `main`. These checks validate local Markdown links, research source IDs and configuration safety defaults. They do not validate external URLs, prove technical claims, or test a deployed runtime.
+Run `python scripts/check_docs.py`, `python scripts/validate_preconfiguration.py` and `python -m unittest discover -s tests -v` locally. GitHub Actions runs these checks on pull requests and pushes to `main`. These checks validate local Markdown links, research source IDs and configuration safety defaults. They do not validate external URLs, prove technical claims, or test a deployed runtime.
 
 ## Safety posture
 
