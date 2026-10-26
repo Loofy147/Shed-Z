@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "policy_name": "Shed-Z preconfiguration baseline",
+  "status": "preconfiguration_not_runtime_enforcement",
+  "default_decision": "DENY",
+  "decision_values": [
+    "DENY",
+    "APPROVAL_REQUIRED",
+    "ALLOW"
+  ],
+  "enforcement_note": "These are policy intentions only until a runtime gate enforces them and tests prove enforcement.",
+  "actions": [
+    {
+      "action": "read_allowlisted_repository",
+      "decision": "ALLOW",
+      "scope": "explicit repository and pinned ref only"
+    },
+    {
+      "action": "read_ci_logs_and_artifacts",
+      "decision": "ALLOW",
+      "scope": "explicit repository and run ID only"
+    },
+    {
+      "action": "run_tests_in_disposable_worker",
+      "decision": "ALLOW",
+      "conditions": [
+        "worker_is_isolated",
+        "resource_limits_configured",
+        "no_production_credentials"
+      ]
+    },
+    {
+      "action": "write_scratch_worktree",
+      "decision": "ALLOW",
+      "conditions": [
+        "sandboxed_worker",
+        "repository_scope_fixed",
+        "diff_retained"
+      ]
+    },
+    {
+      "action": "create_branch_or_commit",
+      "decision": "APPROVAL_REQUIRED",
+      "approval_binding": [
+        "repository",
+        "branch",
+        "path_scope",
+        "diff_digest"
+      ]
+    },
+    {
+      "action": "open_or_update_pull_request",
+      "decision": "APPROVAL_REQUIRED",
+      "approval_binding": [
+        "repository",
+        "base_branch",
+        "head_branch",
+        "diff_digest"
+      ]
+    },
+    {
+      "action": "merge_pull_request",
+      "decision": "DENY",
+      "reason": "not part of initial preconfiguration"
+    },
+    {
+      "action": "deploy_or_release",
+      "decision": "DENY",
+      "reason": "not part of initial preconfiguration"
+    },
+    {
+      "action": "send_external_message",
+      "decision": "DENY",
+      "reason": "no external communication connector approved"
+    },
+    {
+      "action": "delete_data_or_resources",
+      "decision": "DENY",
+      "reason": "destructive action path not implemented or tested"
+    },
+    {
+      "action": "change_permissions_or_credentials",
+      "decision": "DENY",
+      "reason": "control-plane changes excluded from initial pilot"
+    },
+    {
+      "action": "read_personal_files_or_browser_profiles",
+      "decision": "DENY"
+    },
+    {
+      "action": "read_secret_stores_or_private_keys",
+      "decision": "DENY"
+    },
+    {
+      "action": "install_unreviewed_extension_or_mcp_server",
+      "decision": "DENY"
+    },
+    {
+      "action": "create_paid_resource_or_subscription",
+      "decision": "DENY",
+      "reason": "no explicit budget authorization exists"
+    },
+    {
+      "action": "access_unlisted_network_destination",
+      "decision": "DENY"
+    },
+    {
+      "action": "unknown_action",
+      "decision": "DENY"
+    }
+  ]
+}
