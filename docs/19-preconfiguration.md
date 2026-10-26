@@ -11,7 +11,7 @@ Prepare the configuration boundaries before a computer exists. This pack defines
 
 - `config/preconfiguration.json` — target, networking, runtime, model, budget, audit and recovery fields. Unknown environment values remain null.
 - `config/action-policy.json` — action-level baseline. Unknown actions, external effects and high-impact capabilities are denied or require explicit approval.
-- `config/job-catalog.json` — candidate jobs and acceptance criteria. All Shed-Z runtime jobs are disabled by default.
+- `config/job-catalog.json` — candidate jobs and acceptance criteria. All Shed-Z runtime jobs are explicitly disabled; a separate `enabled` field is required for a later reviewed promotion.
 - `scripts/validate_preconfiguration.py` — offline checks for configuration integrity and safe defaults.
 - `scripts/check_docs.py` — existing document link and research source-reference check.
 
