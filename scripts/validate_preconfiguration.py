@@ -77,6 +77,28 @@ def validate() -> list[str]:
             action_ids.append(action_id)
         require(item.get("decision") in ALLOWED_DECISIONS, f"invalid decision for action {action_id!r}", errors)
     require(len(action_ids) == len(set(action_ids)), "action policy contains duplicate action names", errors)
+    observed_action_decisions = {a.get("action"): a.get("decision") for a in actions if isinstance(a, dict)}
+    required_action_decisions = {
+        "read_allowlisted_repository": "ALLOW",
+        "run_tests_in_disposable_worker": "ALLOW",
+        "write_scratch_worktree": "ALLOW",
+        "create_branch_or_commit": "APPROVAL_REQUIRED",
+        "open_or_update_pull_request": "APPROVAL_REQUIRED",
+        "merge_pull_request": "DENY",
+        "deploy_or_release": "DENY",
+        "send_external_message": "DENY",
+        "delete_data_or_resources": "DENY",
+        "change_permissions_or_credentials": "DENY",
+        "read_personal_files_or_browser_profiles": "DENY",
+        "read_secret_stores_or_private_keys": "DENY",
+        "install_unreviewed_extension_or_mcp_server": "DENY",
+        "create_paid_resource_or_subscription": "DENY",
+        "access_unlisted_network_destination": "DENY",
+        "unknown_action": "DENY",
+    }
+    for action_id, expected_decision in required_action_decisions.items():
+        require(observed_action_decisions.get(action_id) == expected_decision,
+                f"action {action_id!r} must be set to {expected_decision}", errors)
     require(any(a.get("action") == "unknown_action" and a.get("decision") == "DENY" for a in actions if isinstance(a, dict)), "unknown_action must explicitly be denied", errors)
 
     require(catalog.get("schema_version") == 1, "job-catalog schema_version must equal 1", errors)
