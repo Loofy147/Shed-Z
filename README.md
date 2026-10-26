@@ -19,7 +19,8 @@ Shed-Z is an evidence-gated foundation for an always-on, privately reachable age
 - Secure instruction-governance strategy
 - Add-on feature catalog and specifications
 - Machine-independent preconfiguration, fail-closed action policy and disabled job catalog
-- Offline preconfiguration validator, regression tests and documentation validation CI
+- Local-only promotion-evidence template and host/config fingerprint binding
+- Strict offline validator, expanded negative-fixture tests and read-only CI validation
 
 ## Core logic in one sentence
 
@@ -34,7 +35,8 @@ The available resources are the centre of gravity. Use verified existing capabil
 - `docs/18-cost-and-capacity-model.md` — cost formulae, capacity caps and budget approval record
 - `docs/19-preconfiguration.md` — configuration contract, safe defaults and later host-binding steps
 - `docs/20-host-arrival-runbook.md` — ordered checks for the first available computer
-- `config/` — deployment-disabled configuration and action-policy/job templates
+- `docs/21-readiness-and-test-matrix.md` — which test claims are supported and which host/runtime checks remain open
+- `config/` — deployment-disabled templates and a promotion-evidence example; machine-specific values belong only in ignored local copies
 
 These files prepare the decision; they do not claim the target host, private network, provider entitlements or budget are verified. Phase 0 remains open until those facts and the first jobs are confirmed.
 
@@ -73,10 +75,11 @@ These are specifications and role contracts, not claims that separate agents or 
 17. `docs/15-addon-specifications.md`
 18. `docs/08-roadmap.md`
 19. `docs/10-production-readiness.md`
+20. `docs/21-readiness-and-test-matrix.md`
 
 ## Validate documentation
 
-Run `python scripts/check_docs.py`, `python scripts/validate_preconfiguration.py` and `python -m unittest discover -s tests -v` locally. GitHub Actions runs these checks on pull requests and pushes to `main`. These checks validate local Markdown links, research source IDs and configuration safety defaults. They do not validate external URLs, prove technical claims, or test a deployed runtime.
+Run `python scripts/check_docs.py`, `python scripts/validate_preconfiguration.py` and `python -m unittest discover -s tests -v` locally. GitHub Actions runs with read-only permissions, a bounded timeout, concurrency cancellation, SHA-pinned actions and weekly dependency-update checks. The suite covers documentation failure fixtures, strict configuration rules and synthetic promotion-manifest completeness. It does not test a deployed runtime, independently verify evidence references or prove technical claims.
 
 ## Safety posture
 

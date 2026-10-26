@@ -47,35 +47,35 @@ Private connectivity is necessary but not sufficient: test application/tool perm
 
 ## Gate 3 — Bind the prepared configuration
 
-Update config/preconfiguration.json, config/action-policy.json and config/job-catalog.json only when each value is supported by evidence.
+Keep the tracked templates unchanged for machine-specific values. Copy them to the ignored local files documented in docs/19-preconfiguration.md. Edit local copies only when each value is supported by evidence.
 
-- [ ] Fill actual host type/name/OS and non-admin service identity.
-- [ ] Fill reviewed remote-access provider and policy status.
+- [ ] Fill actual host type/name/OS, non-admin service identity and configuration fingerprint.
+- [ ] Fill reviewed private remote-access provider and policy status.
 - [ ] Keep public ingress disabled and use deny-unlisted network egress.
-- [ ] Set resource/time limits from measured capacity and the selected job.
-- [ ] Choose the model mode only after privacy, quality, latency, quota and cost review.
-- [ ] Record an explicit monthly limit/currency and hard-stop behavior before authorizing any metered usage.
+- [ ] Set measured CPU, memory, process, disk, timeout and retry limits.
+- [ ] Choose model mode only after privacy, quality, latency, quota and cost review; add per-task token/money limits when hosted inference is used.
+- [ ] Record monthly and one-time spending ceilings, currency and a tested hard-stop behavior.
+- [ ] Configure independent audit, encrypted durable task state, checkpoints, idempotency, tested backup/restore and an independent stop path.
 - [ ] Keep high-impact actions denied or approval-gated.
-- [ ] Enable one specific job only after its task class, target, permissions and acceptance criteria are approved.
+- [ ] Keep jobs disabled until the candidate config, policy and host-bound evidence are reviewed.
 
-Run these checks from the repository root:
+Run from the repository root: python scripts/check_docs.py; python scripts/validate_preconfiguration.py; python -m unittest discover -s tests -v.
 
-    python scripts/check_docs.py
-    python scripts/validate_preconfiguration.py
-    python -m unittest discover -s tests -v
-
-A passing configuration check proves only that the checked files satisfy the coded guardrails. It does not establish runtime enforcement.
+A passing check proves only that effective local configuration satisfies coded guardrails. It does not verify referenced evidence or establish runtime enforcement. The local fingerprint helper requires all three local candidate files; put the resulting digest in both local preconfiguration and local promotion evidence. Any later config, policy or job-catalog change alters the digest.
 
 ## Gate 4 — Recoverability and isolation before agent work
 
-- [ ] Configure a backup of minimal configuration and required durable state.
+- [ ] Configure a backup of minimal configuration and required durable task state.
 - [ ] Restore that backup into a clean location or environment and verify it.
 - [ ] Verify the worker cannot read operator data or configuration secrets.
 - [ ] Verify unlisted network egress is blocked.
 - [ ] Verify the policy layer denies a forbidden action before the side effect.
 - [ ] Verify approvals bind to the exact action, arguments and target.
-- [ ] Verify the agent cannot alter the independent audit history.
-- [ ] Revoke the test credential and confirm access stops.
+- [ ] Verify the agent cannot alter independent audit history.
+- [ ] Revoke a test credential and confirm access stops.
+- [ ] Test durable checkpoints, idempotency and recovery after process/host interruption.
+- [ ] Test timeout, cancellation, worker failure, bounded retries and spending hard stop.
+- [ ] Record every result in the local evidence manifest with host fingerprint, exact runtime/policy versions, UTC timestamp and reviewable artifact reference.
 - [ ] Record failures and residual uncertainty; do not accept undocumented exceptions.
 
 ## Gate 5 — First bounded job

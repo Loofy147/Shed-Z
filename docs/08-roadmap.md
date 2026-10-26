@@ -15,11 +15,15 @@ The roadmap advances only when the prior phase's exit criteria are met. Dates ar
 - [x] Inventory currently visible resources and preserve unverified constraints as UNKNOWN in `17-available-resource-inventory.md`.
 - [x] Define cost, capacity and approval controls in `18-cost-and-capacity-model.md`.
 - [x] Prepare a deployment-disabled config, fail-closed action policy, disabled job catalog and offline validator in `19-preconfiguration.md` and `config/`.
-- [x] Add six regression tests for the fail-closed promotion and policy rules.
-- [x] Prepare a host-arrival runbook while keeping host-dependent facts unset.
+- [x] Separate tracked templates from ignored local configs and add a host/config fingerprint-bound promotion evidence manifest.
+- [x] Expand tests for malformed JSON, duplicate keys, type coercion, policy tampering, job catalog and incomplete promotion evidence.
+- [x] Add documentation negative fixtures for broken links, escaping paths, unknown source IDs, incomplete ranges and invalid UTF-8.
+- [x] Pin workflow actions by full commit SHA, disable persisted checkout credentials and add weekly dependency-update checks.
+- [x] Prepare a readiness/test matrix and host-arrival runbook while keeping host facts unset.
 - [ ] Owner confirms the first two real jobs, output expectations and failure boundaries.
 - [ ] Inspect the actual candidate host, operating system, memory, disk, GPU if present, uptime and recovery access.
 - [ ] Inspect actual remote-access/Tailscale status and access policies before relying on private connectivity.
+- [ ] Implement/select and independently test a real runtime policy-enforcement boundary.
 - [ ] Record an owner-approved monthly incremental spend ceiling and one-time purchase ceiling, even if the approved values are zero.
 - [ ] Choose acceptance thresholds for the first job set and record the evidence destination.
 

@@ -47,7 +47,7 @@ Purpose: establish a repeatable baseline without granting an agent broad authori
 - Evidence: commit SHA, workflow run ID, job conclusion and, for test fixtures, expected/actual exit status.
 - Limitation: this does not verify external URLs, prove research claims or test runtime security.
 
-The first workflow pass is established for the current PR head. Negative tests for deliberately broken fixtures remain open until run.
+The CI run includes negative fixtures for broken local links, repository-escaping paths, unknown source IDs, incomplete source ranges, missing source registers and invalid UTF-8. These tests verify the checker’s programmed behavior, not external URL reachability or research-claim truth.
 
 ### Job B — Read-only repository assessment
 

@@ -9,12 +9,16 @@ Prepare the configuration boundaries before a computer exists. This pack defines
 
 ## Files
 
-- `config/preconfiguration.json` — target, networking, runtime, model, budget, audit and recovery fields. Unknown environment values remain null.
-- `config/action-policy.json` — action-level baseline. Unknown actions, external effects and high-impact capabilities are denied or require explicit approval.
-- `config/job-catalog.json` — candidate jobs and acceptance criteria. All Shed-Z runtime jobs are explicitly disabled; a separate `enabled` field is required for a later reviewed promotion.
-- `scripts/validate_preconfiguration.py` — offline checks for configuration integrity and safe defaults.
-- `tests/test_preconfiguration.py` — regression tests that prove unsafe promotion, policy weakening, early job enablement, public ingress and secret-value configuration are rejected.
-- `scripts/check_docs.py` — existing document link and research source-reference check.
+- `config/preconfiguration.json` — tracked safe template for host, network, runtime, model, budget, audit, recovery and durable-state settings.
+- `config/action-policy.json` — deny-by-default policy; runtime enforcement is explicitly marked as not implemented.
+- `config/job-catalog.json` — candidate job classes, disabled in the tracked baseline.
+- `config/promotion-evidence.example.json` — local-only manifest shape for host-bound security tests; all required checks start unfilled.
+- `scripts/validate_preconfiguration.py` — strict offline checks plus a local candidate fingerprint helper.
+- `tests/test_preconfiguration.py` — regression tests for malformed config, policy tampering, invalid job states and promotion evidence binding.
+- `tests/test_check_docs.py` — negative-fixture tests for documentation checking.
+- `scripts/check_docs.py` — local document link and research-source reference checker.
+- `.github/workflows/docs-validation.yml` — read-only workflow with full commit-SHA action pins.
+- `.github/dependabot.yml` — weekly GitHub Actions dependency-update checks.
 
 ## Non-negotiable defaults
 
@@ -26,7 +30,7 @@ Prepare the configuration boundaries before a computer exists. This pack defines
 6. New paid resources and subscriptions are denied until an explicit spend limit is approved.
 7. High-impact actions have no implicit approval.
 8. No job is enabled by default. The catalog records candidates, not active autonomous workloads.
-9. A worker is not promoted to unattended use until a non-admin service identity, resource limits, reviewed remote access, independent audit storage, tested backup/restore and an independent stop control are evidenced.
+9. A worker is not promoted to unattended use until measured CPU/memory/process/disk/time limits, reviewed private access, separate audit storage, encrypted durable state, tested backup/restore, independent stop controls and host-bound evidence for the exact configuration/runtime/policy versions are reviewed.
 
 ## Validate without a computer
 
@@ -44,20 +48,23 @@ The checks are configuration-integrity checks, not a security certification. The
 
 After an actual target machine becomes available:
 
-1. Record its type, hostname, OS, resource capacity, service identity and recovery access in the inventory document.
-2. Select one private remote-access mechanism and capture the reviewed policy evidence.
-3. Update configuration with only measured limits; do not guess CPU/RAM/GPU or uptime.
-4. Select an initial job and inference mode. Hosted inference requires provider/model identification and a documented data/budget decision. Local inference requires a real benchmark on the target hardware.
-5. Record explicit monthly/one-time spending authorization. A missing limit is not permission to spend.
-6. Implement and test enforcement, worker isolation and an independent stop path before enabling any job.
-7. Promote only after the configuration validator passes and the deployment/recovery security tests have recorded results.
-
-Do not paste secret values into tracked files. Later credentials must enter via a separately reviewed secret mechanism; the exact mechanism is deliberately open until the host and runtime are selected.
+1. Copy the tracked templates to the ignored local files named config/local-preconfiguration.json, config/local-action-policy.json and config/local-job-catalog.json. Keep machine-specific details out of tracked templates.
+2. Record host type/name/OS, capacity, service identity, recovery access and a canonical configuration fingerprint.
+3. Select one private remote-access mechanism and capture reviewed policy evidence.
+4. Derive CPU, memory, process, disk and timeout limits from measured capacity; bound retries and concurrency.
+5. Select model mode after privacy, quality, latency, quota and cost review; add per-task token or monetary caps where relevant.
+6. Record monthly and one-time spending ceilings, currency and tested hard-stop behavior.
+7. Implement and test enforcement, worker isolation, encrypted durable state, checkpointing, idempotency, independent audit and an independent stop path.
+8. After completing the local candidate and selecting one job, run the validator with the --print-fingerprint argument. Copy its digest to host.config_fingerprint_sha256 and the local evidence manifest. The digest covers effective preconfiguration, action policy and job catalog but excludes its own field.
+9. Fill the local evidence manifest with exact runtime/policy/enforcement versions, reviewer, UTC observation times and safe references to each required test artifact.
+10. Promote only after static validation passes and a human independently reviews the actual referenced artifacts. A complete manifest is not proof that tests were performed.
 
 ## Promotion gate
 
-The baseline validator intentionally rejects a partially enabled deployment. Switching runtime flags alone is insufficient. A deployed configuration must name its host, OS and non-admin service identity; prove reviewed private access; set CPU/memory/time limits; select a model mode; record explicit spend authorization; configure independent audit and backup/restore; and define at least one job. Human review of the resulting evidence is still required.
+The validator rejects partial promotion candidates. In addition to host/network/runtime/model/budget/state requirements, it requires a local evidence manifest with all required checks marked PASS and bound to the same host/config fingerprint and runtime/policy/enforcement versions. The fingerprint identifies the reviewed config; it does not prove test outcomes. A reviewer must inspect the underlying artifacts.
+
+The action policy currently marks runtime enforcement as not implemented. Changing a field to verified does not implement enforcement: a real implementation and independently reviewable test result are required. Static validation is not deployment authorization.
 
 ## Current state
 
-No computer is currently available for Shed-Z use, so host-specific fields intentionally remain unset. This is an availability constraint, not a claim that no computer exists. It is not a blocker for preparing the policy contract, job definitions, config validator and CI checks; it is a blocker for installation, capacity claims, remote-access claims and deployment-readiness claims. See the host-arrival runbook in docs/20-host-arrival-runbook.md.
+No computer is currently available for Shed-Z use, so the tracked template leaves host-specific fields unset. Runtime enforcement is explicitly marked not implemented. CI checks static validation and synthetic manifest behavior; they are not host/runtime tests. Installation, resource benchmarks, access-control tests, runtime security, backup/restore and deployment-readiness claims remain blocked. See docs/20-host-arrival-runbook.md and docs/21-readiness-and-test-matrix.md.
