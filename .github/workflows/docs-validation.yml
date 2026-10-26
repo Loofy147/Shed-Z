@@ -25,3 +25,5 @@ jobs:
         run: python scripts/check_docs.py
       - name: Validate preconfiguration safety gates
         run: python scripts/validate_preconfiguration.py
+      - name: Test fail-closed promotion and denial rules
+        run: python -m unittest discover -s tests -v
