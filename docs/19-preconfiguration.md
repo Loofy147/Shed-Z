@@ -60,4 +60,4 @@ The baseline validator intentionally rejects a partially enabled deployment. Swi
 
 ## Current state
 
-The target computer does not exist yet, so host-specific fields intentionally remain unset. This is not a blocker for preparing the policy contract, job definitions, config validator and CI checks. It is a blocker for installation, capacity claims, remote-access claims and deployment-readiness claims.
+No computer is currently available for Shed-Z use, so host-specific fields intentionally remain unset. This is an availability constraint, not a claim that no computer exists. It is not a blocker for preparing the policy contract, job definitions, config validator and CI checks; it is a blocker for installation, capacity claims, remote-access claims and deployment-readiness claims. See the host-arrival runbook in docs/20-host-arrival-runbook.md.
