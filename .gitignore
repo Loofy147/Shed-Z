@@ -1,0 +1,25 @@
+# Local secrets and operator-specific overrides
+.env
+.env.*
+!.env.example
+config/local*.json
+config/*secret*.json
+.secrets/
+private/
+*.pem
+*.key
+
+# Runtime state and generated outputs
+runtime/
+state/
+logs/
+artifacts/
+backups/
+*.log
+*.pid
+
+# Python local environment/cache
+.venv/
+venv/
+__pycache__/
+*.py[cod]

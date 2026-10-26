@@ -11,10 +11,25 @@ The roadmap advances only when the prior phase's exit criteria are met. Dates ar
 - [x] Define the full agent roster and stateful services.
 - [x] Define the durable state model and secure instruction governance.
 - [x] Define the add-on feature catalog and specifications.
-- [ ] Add a real workload inventory and impact classification.
-- [ ] Record available host/network constraints and an operating-cost ceiling.
+- [x] Add candidate workloads and a risk/impact classification scheme in `16-workload-inventory.md`.
+- [x] Inventory currently visible resources and preserve unverified constraints as UNKNOWN in `17-available-resource-inventory.md`.
+- [x] Define cost, capacity and approval controls in `18-cost-and-capacity-model.md`.
+- [x] Prepare a deployment-disabled config, fail-closed action policy, disabled job catalog and offline validator in `19-preconfiguration.md` and `config/`.
+- [x] Separate tracked templates from ignored local configs and add a host/config fingerprint-bound promotion evidence manifest.
+- [x] Expand tests for malformed JSON, duplicate keys, type coercion, policy tampering, job catalog and incomplete promotion evidence.
+- [x] Add documentation negative fixtures for broken links, escaping paths, unknown source IDs, incomplete ranges and invalid UTF-8.
+- [x] Pin workflow actions by full commit SHA, disable persisted checkout credentials and add weekly dependency-update checks.
+- [x] Prepare a readiness/test matrix and host-arrival runbook while keeping host facts unset.
+- [ ] Owner confirms the first two real jobs, output expectations and failure boundaries.
+- [ ] Inspect the actual candidate host, operating system, memory, disk, GPU if present, uptime and recovery access.
+- [ ] Inspect actual remote-access/Tailscale status and access policies before relying on private connectivity.
+- [ ] Implement/select and independently test a real runtime policy-enforcement boundary.
+- [ ] Record an owner-approved monthly incremental spend ceiling and one-time purchase ceiling, even if the approved values are zero.
+- [ ] Choose acceptance thresholds for the first job set and record the evidence destination.
 
-**Exit gate:** the owner accepts the first two real jobs, non-goals and safety boundary; no runtime is installed just to make the concept feel concrete.
+**Exit gate:** the owner accepts the first two jobs and their safety boundary; the target host and network are identified; the spending ceiling is explicit; acceptance criteria and evidence capture are defined. No runtime is installed just to make the concept feel concrete.
+
+The repository has templates and a preconfiguration validator, but templates and a passing validator are not evidence that a host has been secured or that runtime controls are enforced. Phase 0 remains open until the unchecked owner/environment inputs are supported by evidence.
 
 ## Phase 1 — Safe host and remote-access lab
 
