@@ -45,9 +45,9 @@ class PreconfigurationTests(unittest.TestCase):
     def write_config(self, name: str, value: dict) -> None:
         self.path(name).write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
 
-    def run_validator(self) -> subprocess.CompletedProcess[str]:
+    def run_validator(self, *args: str) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
-            [sys.executable, str(self.root / "scripts" / "validate_preconfiguration.py")],
+            [sys.executable, str(self.root / "scripts" / "validate_preconfiguration.py"), *args],
             cwd=self.root, text=True, capture_output=True, check=False,
         )
 
@@ -253,9 +253,16 @@ class PreconfigurationTests(unittest.TestCase):
         target_job["enabled"] = True
         self.write_config("local-job-catalog.json", catalog)
 
+        fingerprint_result = self.run_validator("--print-fingerprint")
+        self.assertEqual(fingerprint_result.returncode, 0, fingerprint_result.stdout + fingerprint_result.stderr)
+        fingerprint = fingerprint_result.stdout.strip()
+        cfg = self.read_config("local-preconfiguration.json")
+        cfg["host"]["config_fingerprint_sha256"] = fingerprint
+        self.write_config("local-preconfiguration.json", cfg)
+
         observed = "2026-10-26T00:00:00Z"
         evidence = {
-            "schema_version":1, "target_fingerprint_sha256":"a" * 64,
+            "schema_version":1, "target_fingerprint_sha256":fingerprint,
             "runtime_version":"candidate-runtime@1.2.3", "policy_version":"1.0.0",
             "policy_enforcement_version":"policy-gate@1.0.0", "reviewer":"independent-review-record-01",
             "reviewed_at_utc":observed,
@@ -307,6 +314,71 @@ class PreconfigurationTests(unittest.TestCase):
         result = self.run_validator()
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("backup_restore' must have status PASS", result.stderr)
+
+
+
+    def test_unhashable_stage_value_fails_without_traceback(self) -> None:
+        cfg = self.read_config("preconfiguration.json")
+        cfg["stage"] = []
+        self.write_config("preconfiguration.json", cfg)
+        result = self.run_validator()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertIn("stage must be", result.stderr)
+
+    def test_unhashable_host_type_fails_without_traceback(self) -> None:
+        cfg = self.read_config("preconfiguration.json")
+        cfg["host"]["target_type"] = []
+        self.write_config("preconfiguration.json", cfg)
+        result = self.run_validator()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertIn("host.target_type", result.stderr)
+
+    def test_unhashable_model_mode_fails_without_traceback(self) -> None:
+        cfg = self.read_config("preconfiguration.json")
+        cfg["model"]["mode"] = []
+        self.write_config("preconfiguration.json", cfg)
+        result = self.run_validator()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertIn("model.mode", result.stderr)
+
+    def test_unhashable_action_decision_fails_without_traceback(self) -> None:
+        policy = self.read_config("action-policy.json")
+        policy["actions"][0]["decision"] = []
+        self.write_config("action-policy.json", policy)
+        result = self.run_validator()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertIn("invalid decision", result.stderr)
+
+    def test_unhashable_enforcement_status_fails_without_traceback(self) -> None:
+        policy = self.read_config("action-policy.json")
+        policy["runtime_enforcement"]["status"] = []
+        self.write_config("action-policy.json", policy)
+        result = self.run_validator()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertIn("runtime_enforcement.status", result.stderr)
+
+    def test_unhashable_job_id_fails_without_traceback(self) -> None:
+        catalog = self.read_config("job-catalog.json")
+        catalog["jobs"][0]["id"] = []
+        self.write_config("job-catalog.json", catalog)
+        result = self.run_validator()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertIn("job must have a non-empty id", result.stderr)
+
+    def test_configuration_fingerprint_detects_config_drift(self) -> None:
+        self.prepare_valid_promotion_candidate()
+        cfg = self.read_config("local-preconfiguration.json")
+        cfg["model"]["model_id"] = "altered-after-review"
+        self.write_config("local-preconfiguration.json", cfg)
+        result = self.run_validator()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("effective configuration fingerprint", result.stderr)
 
 
 if __name__ == "__main__":

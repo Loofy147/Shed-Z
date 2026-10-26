@@ -8,6 +8,8 @@ security tests were performed correctly.
 
 from __future__ import annotations
 
+import argparse
+import hashlib
 import json
 import re
 import sys
@@ -228,7 +230,7 @@ def validate_preconfiguration(cfg: dict[str, Any], errors: list[str]) -> None:
     require(type(cfg.get("schema_version")) is int and cfg.get("schema_version") == 1,
             "preconfiguration schema_version must equal integer 1", errors)
     require(cfg.get("project") == "Shed-Z", "project must equal 'Shed-Z'", errors)
-    require(cfg.get("stage") in {"preconfiguration", "promotion_candidate"},
+    require(isinstance(cfg.get("stage"), str) and cfg.get("stage") in {"preconfiguration", "promotion_candidate"},
             "stage must be 'preconfiguration' or 'promotion_candidate'", errors)
     require(type(cfg.get("deployment_enabled")) is bool,
             "deployment_enabled must be a boolean", errors)
@@ -246,7 +248,7 @@ def validate_preconfiguration(cfg: dict[str, Any], errors: list[str]) -> None:
     for key in ("target_type", "hostname", "os_family", "service_identity"):
         value = host.get(key)
         require(value is None or nonempty(value), f"host.{key} must be null or a non-empty string", errors)
-    require(host.get("target_type") is None or host.get("target_type") in HOST_TYPES,
+    require(host.get("target_type") is None or (isinstance(host.get("target_type"), str) and host.get("target_type") in HOST_TYPES),
             "host.target_type must be null or a recognized host type", errors)
     value = host.get("service_identity_is_non_admin")
     require(value is None or type(value) is bool,
@@ -294,7 +296,7 @@ def validate_preconfiguration(cfg: dict[str, Any], errors: list[str]) -> None:
                     f"execution.{key} must be null or a positive integer", errors)
 
     mode = model.get("mode")
-    require(mode is None or mode in MODEL_MODES,
+    require(mode is None or (isinstance(mode, str) and mode in MODEL_MODES),
             "model.mode must be null or one of hosted/local/hybrid", errors)
     for key in ("provider", "model_id", "local_server_url", "cost_limit_currency"):
         value = model.get(key)
@@ -308,7 +310,7 @@ def validate_preconfiguration(cfg: dict[str, Any], errors: list[str]) -> None:
     if model.get("per_task_cost_limit") is not None:
         require(nonempty(model.get("cost_limit_currency")),
                 "a per-task monetary limit requires model.cost_limit_currency", errors)
-    if mode in {"hosted", "hybrid"}:
+    if isinstance(mode, str) and mode in {"hosted", "hybrid"}:
         require(nonempty(model.get("provider")) and nonempty(model.get("model_id")),
                 "hosted/hybrid inference requires model.provider and model.model_id", errors)
     if mode == "local":
@@ -397,7 +399,7 @@ def validate_action_policy(policy: dict[str, Any], errors: list[str]) -> None:
             continue
         action_ids.append(action_id)
         decision = item.get("decision")
-        require(decision in ALLOWED_DECISIONS, f"invalid decision for action {action_id!r}", errors)
+        require(isinstance(decision, str) and decision in ALLOWED_DECISIONS, f"invalid decision for action {action_id!r}", errors)
         observed[action_id] = decision
         if decision == "ALLOW":
             conditions = item.get("conditions")
@@ -419,7 +421,7 @@ def validate_action_policy(policy: dict[str, Any], errors: list[str]) -> None:
                 f"action {action_id!r} must be set to {decision}", errors)
 
     enforcement = section(policy, "runtime_enforcement", "action-policy.runtime_enforcement", errors)
-    require(enforcement.get("status") in {"not_implemented", "candidate", "verified"},
+    require(isinstance(enforcement.get("status"), str) and enforcement.get("status") in {"not_implemented", "candidate", "verified"},
             "action-policy.runtime_enforcement.status must be not_implemented, candidate or verified", errors)
     for key in ("implementation_ref", "version", "independent_test_evidence_ref"):
         value = enforcement.get(key)
@@ -459,7 +461,7 @@ def validate_job_catalog(catalog: dict[str, Any], errors: list[str]) -> list[dic
                 f"job {job_id!r} must have non-empty acceptance criteria", errors)
         require(string_list(job.get("external_effects")) or string_list(job.get("forbidden_effects")),
                 f"job {job_id!r} must document external effects or forbidden effects", errors)
-        if job_id in {"J-002", "J-003"}:
+        if isinstance(job_id, str) and job_id in {"J-002", "J-003"}:
             require(string_list(job.get("required_inputs")),
                     f"job {job_id!r} must declare required_inputs", errors)
         if job_id == "J-003":
@@ -475,9 +477,25 @@ def validate_job_catalog(catalog: dict[str, Any], errors: list[str]) -> list[dic
     return valid_jobs
 
 
+def effective_configuration_fingerprint(
+    cfg: dict[str, Any],
+    policy: dict[str, Any],
+    catalog: dict[str, Any],
+) -> str:
+    """Hash effective config and policies, excluding the self-referential hash field."""
+    normalized_cfg = json.loads(json.dumps(cfg, sort_keys=True, ensure_ascii=False, allow_nan=False))
+    host = normalized_cfg.get("host")
+    if isinstance(host, dict):
+        host.pop("config_fingerprint_sha256", None)
+    payload = {"preconfiguration": normalized_cfg, "action_policy": policy, "job_catalog": catalog}
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False).encode("utf-8")
+    return hashlib.sha256(canonical).hexdigest()
+
+
 def validate_promotion_evidence(
     cfg: dict[str, Any],
     policy: dict[str, Any],
+    catalog: dict[str, Any],
     errors: list[str],
 ) -> None:
     try:
@@ -495,6 +513,11 @@ def validate_promotion_evidence(
     host = cfg.get("host", {}) if isinstance(cfg.get("host"), dict) else {}
     require(fingerprint == host.get("config_fingerprint_sha256"),
             "promotion evidence target fingerprint must match host.config_fingerprint_sha256", errors)
+    expected_fingerprint = effective_configuration_fingerprint(cfg, policy, catalog)
+    require(host.get("config_fingerprint_sha256") == expected_fingerprint,
+            "host.config_fingerprint_sha256 does not match the effective configuration, action policy and job catalog", errors)
+    require(fingerprint == expected_fingerprint,
+            "promotion evidence fingerprint does not match the effective configuration fingerprint", errors)
     execution = cfg.get("execution", {}) if isinstance(cfg.get("execution"), dict) else {}
     require(evidence.get("runtime_version") == execution.get("agent_runtime") and nonempty(evidence.get("runtime_version")),
             "promotion evidence runtime_version must match the configured agent_runtime version", errors)
@@ -586,12 +609,14 @@ def validate() -> tuple[list[str], bool]:
         recovery = cfg.get("recovery", {}) if isinstance(cfg.get("recovery"), dict) else {}
         state = cfg.get("state", {}) if isinstance(cfg.get("state"), dict) else {}
 
-        require(host.get("target_type") in HOST_TYPES, "promotion requires a recognized host.target_type", errors)
+        require(isinstance(host.get("target_type"), str) and host.get("target_type") in HOST_TYPES,
+                "promotion requires a recognized host.target_type", errors)
         require(nonempty(host.get("hostname")), "promotion requires host.hostname", errors)
         require(nonempty(host.get("os_family")), "promotion requires host.os_family", errors)
         require(nonempty(host.get("service_identity")) and host.get("service_identity_is_non_admin") is True,
                 "promotion requires an explicitly verified non-admin service identity", errors)
         require(nonempty(host.get("config_fingerprint_sha256"))
+                and isinstance(host.get("config_fingerprint_sha256"), str)
                 and SHA256_RE.fullmatch(host.get("config_fingerprint_sha256", "")) is not None,
                 "promotion requires host.config_fingerprint_sha256", errors)
 
@@ -621,8 +646,10 @@ def validate() -> tuple[list[str], bool]:
         require(nonnegative_integer(execution.get("max_retries")) and execution.get("max_retries") <= 3,
                 "promotion requires a bounded retry count from 0 through 3", errors)
 
-        require(model.get("mode") in MODEL_MODES, "promotion requires a documented model inference mode", errors)
-        if model.get("mode") in {"hosted", "hybrid"}:
+        promotion_mode = model.get("mode")
+        require(isinstance(promotion_mode, str) and promotion_mode in MODEL_MODES,
+                "promotion requires a documented model inference mode", errors)
+        if isinstance(promotion_mode, str) and promotion_mode in {"hosted", "hybrid"}:
             require(
                 positive_integer(model.get("per_task_token_limit")) or positive_number(model.get("per_task_cost_limit")),
                 "hosted/hybrid inference requires a per-task token or monetary ceiling", errors,
@@ -674,15 +701,60 @@ def validate() -> tuple[list[str], bool]:
                 and nonempty(enforcement.get("version"))
                 and nonempty(enforcement.get("independent_test_evidence_ref")),
                 "promotion requires a named policy-enforcement implementation, version and independent test evidence", errors)
-        validate_promotion_evidence(cfg, policy, errors)
+        validate_promotion_evidence(cfg, policy, catalog, errors)
 
     return errors, promotion_requested
 
 
-def main() -> int:
+def print_candidate_fingerprint() -> int:
+    """Print a digest for a prepared local candidate; this does not promote it."""
+    local_paths = [CONFIG_DIR / CONFIG_FILES[key][1] for key in ("preconfiguration", "action_policy", "job_catalog")]
+    if not all(path.exists() or path.is_symlink() for path in local_paths):
+        print("Fingerprint creation requires all three ignored local configuration copies.", file=sys.stderr)
+        return 1
+    try:
+        cfg = load_json(CONFIG_DIR / CONFIG_FILES["preconfiguration"][1])
+        policy = load_json(CONFIG_DIR / CONFIG_FILES["action_policy"][1])
+        catalog = load_json(CONFIG_DIR / CONFIG_FILES["job_catalog"][1])
+    except (ValueError, TypeError, KeyError, OSError) as exc:
+        print(f"Preconfiguration fingerprint failed: {exc}", file=sys.stderr)
+        return 1
+    errors: list[str] = []
+    scan_for_secret_values(cfg, "preconfiguration", errors)
+    scan_for_secret_values(policy, "action_policy", errors)
+    scan_for_secret_values(catalog, "job_catalog", errors)
+    validate_preconfiguration(cfg, errors)
+    validate_action_policy(policy, errors)
+    jobs = validate_job_catalog(catalog, errors)
+    require(cfg.get("stage") == "promotion_candidate", "fingerprint creation requires stage='promotion_candidate'", errors)
+    require(cfg.get("deployment_enabled") is True and isinstance(cfg.get("execution"), dict)
+            and cfg["execution"].get("enabled") is True,
+            "fingerprint creation requires deployment/runtime flags set in the local candidate", errors)
+    require(any(job.get("enabled") is True for job in jobs),
+            "fingerprint creation requires one explicitly selected local job", errors)
+    if errors:
+        print(f"Preconfiguration fingerprint failed with {len(errors)} issue(s):", file=sys.stderr)
+        for error in errors:
+            print(f" - {error}", file=sys.stderr)
+        return 1
+    try:
+        print(effective_configuration_fingerprint(cfg, policy, catalog))
+    except (TypeError, ValueError) as exc:
+        print(f"Preconfiguration fingerprint failed: {exc}", file=sys.stderr)
+        return 1
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Validate Shed-Z configuration templates and local promotion evidence.")
+    parser.add_argument("--print-fingerprint", action="store_true",
+                        help="print the fingerprint of the prepared local candidate without deployment or verification")
+    args = parser.parse_args(argv)
+    if args.print_fingerprint:
+        return print_candidate_fingerprint()
     try:
         errors, promotion_requested = validate()
-    except ValueError as exc:
+    except (ValueError, TypeError, KeyError, OSError) as exc:
         print(f"Preconfiguration validation failed: {exc}", file=sys.stderr)
         return 1
 
