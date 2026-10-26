@@ -22,7 +22,7 @@ A green CI result is evidence for the executed checks only. It does not prove ho
 
 ## What the tests now cover
 
-The automated regression suite includes malformed JSON, duplicate keys, non-standard JSON numbers, wrong top-level types, malformed nested sections, type-coercion attempts, non-string enum values, missing/duplicate/changed action-policy entries, unrecognized allowed actions, duplicate job IDs, invalid acceptance criteria, wildcard egress, obvious nested credential fields, incomplete spend ceilings, partial promotion, missing or failed evidence checks, different host fingerprints and changes to configuration after fingerprinting.
+The automated regression suite includes malformed JSON, duplicate keys, non-standard JSON numbers, wrong top-level types, malformed nested sections, type-coercion attempts, non-string enum values, unknown fields in config/policy/job/evidence objects, inconsistent policy-status values, missing/duplicate/changed action-policy entries, unrecognized allowed actions, duplicate job IDs, invalid acceptance criteria, wildcard egress, obvious nested credential fields, incomplete spend ceilings, partial promotion, missing or failed evidence checks, different host fingerprints and changes to configuration after fingerprinting.
 
 Documentation-checker fixtures cover a valid link/source pair, broken local links, paths escaping the repository, unknown source IDs, missing source registers, incomplete source ranges and invalid UTF-8.
 
