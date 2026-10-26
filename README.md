@@ -33,6 +33,7 @@ The available resources are the centre of gravity. Use verified existing capabil
 - `docs/17-available-resource-inventory.md` — observed resources, user-reported constraints and unknowns
 - `docs/18-cost-and-capacity-model.md` — cost formulae, capacity caps and budget approval record
 - `docs/19-preconfiguration.md` — configuration contract, safe defaults and later host-binding steps
+- `docs/20-host-arrival-runbook.md` — ordered checks for the first available computer
 - `config/` — deployment-disabled configuration and action-policy/job templates
 
 These files prepare the decision; they do not claim the target host, private network, provider entitlements or budget are verified. Phase 0 remains open until those facts and the first jobs are confirmed.
