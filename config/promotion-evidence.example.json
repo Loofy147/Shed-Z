@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "target_fingerprint_sha256": null,
+  "runtime_version": null,
+  "policy_version": null,
+  "policy_enforcement_version": null,
+  "reviewer": null,
+  "reviewed_at_utc": null,
+  "checks": {
+    "host_hardening": null,
+    "private_access_approved_device": null,
+    "unapproved_device_denied": null,
+    "unlisted_egress_denied": null,
+    "policy_enforcement_before_side_effect": null,
+    "approval_binding": null,
+    "audit_tamper_resistance": null,
+    "credential_revocation": null,
+    "backup_restore": null,
+    "independent_stop_control": null,
+    "worker_data_isolation": null,
+    "budget_hard_stop": null,
+    "bounded_job_acceptance_replay": null,
+    "malformed_input_and_missing_resource": null,
+    "timeout_cancel_and_worker_failure": null,
+    "durable_state_checkpoint_recovery": null,
+    "dependency_inventory_and_pin_verification": null
+  }
+}

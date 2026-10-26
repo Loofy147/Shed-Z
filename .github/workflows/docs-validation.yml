@@ -7,23 +7,32 @@ on:
       - main
   workflow_dispatch:
 
+concurrency:
+  group: shed-z-validation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
 jobs:
   validate:
-    name: Validate documentation and safe configuration defaults
+    name: Validate docs, configuration gates and negative fixtures
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.12"
       - name: Validate documentation links and source references
         run: python scripts/check_docs.py
       - name: Validate preconfiguration safety gates
         run: python scripts/validate_preconfiguration.py
-      - name: Test fail-closed promotion and denial rules
+      - name: Run regression and negative-fixture tests
         run: python -m unittest discover -s tests -v

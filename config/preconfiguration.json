@@ -9,7 +9,8 @@
     "hostname": null,
     "os_family": null,
     "service_identity": null,
-    "service_identity_is_non_admin": null
+    "service_identity_is_non_admin": null,
+    "config_fingerprint_sha256": null
   },
   "network": {
     "private_only_required": true,
@@ -25,14 +26,20 @@
     "session_manager": null,
     "max_concurrent_jobs": 1,
     "default_timeout_seconds": 900,
+    "max_retries": 0,
     "per_job_cpu_limit": null,
-    "per_job_memory_mb": null
+    "per_job_memory_mb": null,
+    "per_job_process_limit": null,
+    "per_job_disk_mb": null
   },
   "model": {
     "mode": null,
     "provider": null,
     "model_id": null,
     "local_server_url": null,
+    "per_task_token_limit": null,
+    "per_task_cost_limit": null,
+    "cost_limit_currency": null,
     "automatic_fallback": false
   },
   "policy": {
@@ -54,11 +61,22 @@
   "observability": {
     "structured_events_required": true,
     "redact_sensitive_values": true,
-    "independent_audit_sink_configured": false
+    "independent_audit_sink_configured": false,
+    "audit_sink_ref": null
   },
   "recovery": {
     "backup_configured": false,
     "restore_tested": false,
-    "independent_stop_control_configured": false
+    "backup_ref": null,
+    "independent_stop_control_configured": false,
+    "stop_control_ref": null
+  },
+  "state": {
+    "store": null,
+    "durable_task_state_enabled": false,
+    "encryption_at_rest_verified": false,
+    "checkpointing_enabled": false,
+    "idempotency_store_enabled": false,
+    "retention_days": null
   }
 }
