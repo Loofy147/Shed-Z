@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "note": "This is a prepared job catalog. No Shed-Z agent runtime is enabled by this file.",
+  "runtime_default_enabled": false,
+  "jobs": [
+    {
+      "id": "J-001",
+      "name": "Documentation integrity",
+      "enabled_by_default": false,
+      "execution_plane": "github_actions",
+      "readiness": "workflow configured on preparation branch; CI observed passing",
+      "permissions": [
+        "read_repository_contents"
+      ],
+      "external_effects": [
+        "publish CI status"
+      ],
+      "acceptance": [
+        "local_markdown_links_valid",
+        "research_source_ids_resolve"
+      ],
+      "limitations": [
+        "does_not_validate_external_urls",
+        "does_not_prove_claim_truth",
+        "does_not_test_runtime_security"
+      ]
+    },
+    {
+      "id": "J-002",
+      "name": "Read-only repository assessment",
+      "enabled_by_default": false,
+      "execution_plane": "future_bounded_worker",
+      "readiness": "candidate; owner confirmation and runtime not available yet",
+      "permissions": [
+        "read_allowlisted_repository",
+        "read_selected_ci_logs"
+      ],
+      "forbidden_effects": [
+        "write_repository",
+        "merge",
+        "deploy",
+        "send_external_message",
+        "read_secrets"
+      ],
+      "acceptance": [
+        "material_claims_link_to_repository_evidence",
+        "unknowns_remain_unknown",
+        "report_reproducible_by_reviewer"
+      ],
+      "required_inputs": [
+        "explicit_repository",
+        "pinned_ref",
+        "task_brief",
+        "acceptance_criteria"
+      ]
+    },
+    {
+      "id": "J-003",
+      "name": "Isolated code/test repair",
+      "enabled_by_default": false,
+      "execution_plane": "future_disposable_worker",
+      "readiness": "candidate; requires host/worker and security tests",
+      "permissions": [
+        "read_allowlisted_repository",
+        "write_scratch_worktree",
+        "run_allowlisted_tests"
+      ],
+      "forbidden_effects": [
+        "direct_push_to_protected_branch",
+        "merge",
+        "deploy",
+        "production_credentials",
+        "unapproved_network_egress"
+      ],
+      "acceptance": [
+        "diff_retained",
+        "tests_recorded",
+        "failure_status_explicit",
+        "independent_review_completed"
+      ],
+      "required_inputs": [
+        "explicit_repository",
+        "pinned_ref",
+        "bounded_change_request",
+        "test_command_allowlist",
+        "resource_limits"
+      ]
+    }
+  ]
+}
