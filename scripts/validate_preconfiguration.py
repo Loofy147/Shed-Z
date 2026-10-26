@@ -53,6 +53,11 @@ REQUIRED_ACTION_DECISIONS = {
     "unknown_action": "DENY",
 }
 REQUIRED_JOB_IDS = {"J-001", "J-002", "J-003"}
+JOB_ALLOWED_FIELDS = {
+    "J-001": {"id", "name", "enabled_by_default", "execution_plane", "readiness", "permissions", "external_effects", "acceptance", "limitations", "enabled"},
+    "J-002": {"id", "name", "enabled_by_default", "execution_plane", "readiness", "permissions", "forbidden_effects", "acceptance", "required_inputs", "enabled"},
+    "J-003": {"id", "name", "enabled_by_default", "execution_plane", "readiness", "permissions", "forbidden_effects", "acceptance", "required_inputs", "enabled"},
+}
 REQUIRED_EVIDENCE_CHECKS = {
     "host_hardening",
     "private_access_approved_device",
@@ -157,6 +162,12 @@ def require(condition: bool, message: str, errors: list[str]) -> None:
         errors.append(message)
 
 
+def reject_unknown_keys(value: dict[str, Any], allowed_keys: set[str], label: str, errors: list[str]) -> None:
+    """Reject fields the current validator does not understand (fail closed on schema drift)."""
+    for key in sorted(set(value) - allowed_keys):
+        errors.append(f"{label} contains unknown field: {key}")
+
+
 def nonempty(value: Any) -> bool:
     return isinstance(value, str) and bool(value.strip())
 
@@ -227,6 +238,10 @@ def scan_for_secret_values(value: Any, label: str, errors: list[str]) -> None:
 
 
 def validate_preconfiguration(cfg: dict[str, Any], errors: list[str]) -> None:
+    reject_unknown_keys(cfg, {
+        "schema_version", "project", "stage", "deployment_enabled", "host", "network",
+        "execution", "model", "policy", "budget", "observability", "recovery", "state",
+    }, "preconfiguration", errors)
     require(type(cfg.get("schema_version")) is int and cfg.get("schema_version") == 1,
             "preconfiguration schema_version must equal integer 1", errors)
     require(cfg.get("project") == "Shed-Z", "project must equal 'Shed-Z'", errors)
@@ -244,6 +259,16 @@ def validate_preconfiguration(cfg: dict[str, Any], errors: list[str]) -> None:
     observability = section(cfg, "observability", "observability", errors)
     recovery = section(cfg, "recovery", "recovery", errors)
     state = section(cfg, "state", "state", errors)
+
+    reject_unknown_keys(host, {"source_strategy", "target_type", "hostname", "os_family", "service_identity", "service_identity_is_non_admin", "config_fingerprint_sha256"}, "host", errors)
+    reject_unknown_keys(network, {"private_only_required", "remote_access_provider", "policy_reviewed", "public_ingress_enabled", "egress_mode", "allowed_destinations"}, "network", errors)
+    reject_unknown_keys(execution, {"enabled", "agent_runtime", "session_manager", "max_concurrent_jobs", "default_timeout_seconds", "max_retries", "per_job_cpu_limit", "per_job_memory_mb", "per_job_process_limit", "per_job_disk_mb"}, "execution", errors)
+    reject_unknown_keys(model, {"mode", "provider", "model_id", "local_server_url", "per_task_token_limit", "per_task_cost_limit", "cost_limit_currency", "automatic_fallback"}, "model", errors)
+    reject_unknown_keys(policy, {"enforcement_boundary", "unknown_actions", "personal_data_access", "secrets_available_to_worker", "unreviewed_extensions_allowed", "high_impact_action_requires_approval"}, "policy", errors)
+    reject_unknown_keys(budget, {"spending_authorized", "approved_monthly_limit", "approved_currency", "one_time_purchase_limit", "hard_stop_required", "alert_at_percent"}, "budget", errors)
+    reject_unknown_keys(observability, {"structured_events_required", "redact_sensitive_values", "independent_audit_sink_configured", "audit_sink_ref"}, "observability", errors)
+    reject_unknown_keys(recovery, {"backup_configured", "restore_tested", "backup_ref", "independent_stop_control_configured", "stop_control_ref"}, "recovery", errors)
+    reject_unknown_keys(state, {"store", "durable_task_state_enabled", "encryption_at_rest_verified", "checkpointing_enabled", "idempotency_store_enabled", "retention_days"}, "state", errors)
 
     for key in ("target_type", "hostname", "os_family", "service_identity"):
         value = host.get(key)
@@ -373,6 +398,10 @@ def validate_preconfiguration(cfg: dict[str, Any], errors: list[str]) -> None:
 
 
 def validate_action_policy(policy: dict[str, Any], errors: list[str]) -> None:
+    reject_unknown_keys(policy, {
+        "schema_version", "policy_version", "policy_name", "status", "default_decision",
+        "decision_values", "enforcement_note", "runtime_enforcement", "actions",
+    }, "action_policy", errors)
     require(type(policy.get("schema_version")) is int and policy.get("schema_version") == 1,
             "action-policy schema_version must equal integer 1", errors)
     require(policy.get("default_decision") == "DENY", "action policy must default to DENY", errors)
@@ -393,6 +422,8 @@ def validate_action_policy(policy: dict[str, Any], errors: list[str]) -> None:
         if not isinstance(item, dict):
             errors.append("each action policy entry must be an object")
             continue
+        reject_unknown_keys(item, {"action", "decision", "scope", "conditions", "approval_binding", "reason"},
+                            "action policy entry", errors)
         action_id = item.get("action")
         require(nonempty(action_id), "every action policy entry must have a non-empty action name", errors)
         if not nonempty(action_id):
@@ -421,8 +452,18 @@ def validate_action_policy(policy: dict[str, Any], errors: list[str]) -> None:
                 f"action {action_id!r} must be set to {decision}", errors)
 
     enforcement = section(policy, "runtime_enforcement", "action-policy.runtime_enforcement", errors)
-    require(isinstance(enforcement.get("status"), str) and enforcement.get("status") in {"not_implemented", "candidate", "verified"},
+    reject_unknown_keys(enforcement, {"status", "implementation_ref", "version", "independent_test_evidence_ref"},
+                        "action-policy.runtime_enforcement", errors)
+    enforcement_status = enforcement.get("status")
+    require(isinstance(enforcement_status, str) and enforcement_status in {"not_implemented", "candidate", "verified"},
             "action-policy.runtime_enforcement.status must be not_implemented, candidate or verified", errors)
+    expected_status = {
+        "not_implemented": "preconfiguration_not_runtime_enforcement",
+        "candidate": "runtime_enforcement_candidate",
+        "verified": "runtime_enforcement_verified",
+    }.get(enforcement_status) if isinstance(enforcement_status, str) else None
+    require(expected_status is not None and policy.get("status") == expected_status,
+            "action_policy.status must match its runtime_enforcement.status", errors)
     for key in ("implementation_ref", "version", "independent_test_evidence_ref"):
         value = enforcement.get(key)
         require(value is None or nonempty(value),
@@ -430,6 +471,7 @@ def validate_action_policy(policy: dict[str, Any], errors: list[str]) -> None:
 
 
 def validate_job_catalog(catalog: dict[str, Any], errors: list[str]) -> list[dict[str, Any]]:
+    reject_unknown_keys(catalog, {"schema_version", "note", "runtime_default_enabled", "jobs"}, "job_catalog", errors)
     require(type(catalog.get("schema_version")) is int and catalog.get("schema_version") == 1,
             "job-catalog schema_version must equal integer 1", errors)
     require(catalog.get("runtime_default_enabled") is False,
@@ -447,6 +489,8 @@ def validate_job_catalog(catalog: dict[str, Any], errors: list[str]) -> list[dic
             continue
         valid_jobs.append(job)
         job_id = job.get("id")
+        if isinstance(job_id, str) and job_id in JOB_ALLOWED_FIELDS:
+            reject_unknown_keys(job, JOB_ALLOWED_FIELDS[job_id], f"job {job_id}", errors)
         require(nonempty(job_id), "every job must have a non-empty id", errors)
         if nonempty(job_id):
             ids.append(job_id)
@@ -505,6 +549,10 @@ def validate_promotion_evidence(
         return
 
     scan_for_secret_values(evidence, "promotion_evidence", errors)
+    reject_unknown_keys(evidence, {
+        "schema_version", "target_fingerprint_sha256", "runtime_version", "policy_version",
+        "policy_enforcement_version", "reviewer", "reviewed_at_utc", "checks",
+    }, "promotion_evidence", errors)
     require(type(evidence.get("schema_version")) is int and evidence.get("schema_version") == 1,
             "promotion evidence schema_version must equal integer 1", errors)
     fingerprint = evidence.get("target_fingerprint_sha256")
@@ -544,6 +592,8 @@ def validate_promotion_evidence(
         if not isinstance(item, dict):
             errors.append(f"promotion evidence check {check_name!r} must be an object")
             continue
+        reject_unknown_keys(item, {"status", "evidence_ref", "observed_at_utc"},
+                            f"promotion evidence check {check_name}", errors)
         require(item.get("status") == "PASS",
                 f"promotion evidence check {check_name!r} must have status PASS", errors)
         reference = item.get("evidence_ref")

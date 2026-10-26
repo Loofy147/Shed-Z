@@ -242,6 +242,7 @@ class PreconfigurationTests(unittest.TestCase):
         self.write_config("local-preconfiguration.json", cfg)
 
         policy = self.read_config("action-policy.json")
+        policy["status"] = "runtime_enforcement_verified"
         policy["runtime_enforcement"] = {
             "status":"verified", "implementation_ref":"policy-gate/implementation-record",
             "version":"policy-gate@1.0.0", "independent_test_evidence_ref":"artifact://tests/policy-enforcement",
@@ -379,6 +380,68 @@ class PreconfigurationTests(unittest.TestCase):
         result = self.run_validator()
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("effective configuration fingerprint", result.stderr)
+
+
+
+    def test_unknown_preconfiguration_field_is_rejected(self) -> None:
+        cfg = self.read_config("preconfiguration.json")
+        cfg["future_runtime_switch"] = True
+        self.write_config("preconfiguration.json", cfg)
+        result = self.run_validator()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("preconfiguration contains unknown field", result.stderr)
+
+    def test_unknown_action_policy_field_is_rejected(self) -> None:
+        policy = self.read_config("action-policy.json")
+        policy["unreviewed_execution_mode"] = "wide_open"
+        self.write_config("action-policy.json", policy)
+        result = self.run_validator()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("action_policy contains unknown field", result.stderr)
+
+    def test_unknown_job_field_is_rejected(self) -> None:
+        catalog = self.read_config("job-catalog.json")
+        catalog["jobs"][0]["privileged"] = True
+        self.write_config("job-catalog.json", catalog)
+        result = self.run_validator()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("job J-001 contains unknown field", result.stderr)
+
+    def test_unknown_evidence_field_is_rejected(self) -> None:
+        self.prepare_valid_promotion_candidate()
+        evidence = self.read_config("local-promotion-evidence.json")
+        evidence["operator_claimed_safe"] = True
+        self.write_config("local-promotion-evidence.json", evidence)
+        result = self.run_validator()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("promotion_evidence contains unknown field", result.stderr)
+
+    def test_policy_status_cannot_disagree_with_enforcement_state(self) -> None:
+        policy = self.read_config("action-policy.json")
+        policy["status"] = "runtime_enforcement_verified"
+        self.write_config("action-policy.json", policy)
+        result = self.run_validator()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("action_policy.status must match", result.stderr)
+
+    def test_action_policy_drift_after_fingerprint_is_rejected(self) -> None:
+        self.prepare_valid_promotion_candidate()
+        policy = self.read_config("local-action-policy.json")
+        policy["policy_name"] = "changed after evidence capture"
+        self.write_config("local-action-policy.json", policy)
+        result = self.run_validator()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("does not match the effective configuration", result.stderr)
+
+    def test_job_catalog_drift_after_fingerprint_is_rejected(self) -> None:
+        self.prepare_valid_promotion_candidate()
+        catalog = self.read_config("local-job-catalog.json")
+        target = next(job for job in catalog["jobs"] if job["id"] == "J-002")
+        target["acceptance"].append("changed_after_evidence_capture")
+        self.write_config("local-job-catalog.json", catalog)
+        result = self.run_validator()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("does not match the effective configuration", result.stderr)
 
 
 if __name__ == "__main__":
