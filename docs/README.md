@@ -32,6 +32,7 @@ This directory contains the Shed-Z foundation package. The documents describe a 
 ## Preconfiguration
 
 - `19-preconfiguration.md` — deployment-disabled configuration pack and host-binding gate
+- `20-host-arrival-runbook.md` — ordered inspection, setup, security and acceptance gates when a computer becomes available
 - `../config/preconfiguration.json` — host/network/runtime/model/budget placeholders
 - `../config/action-policy.json` — deny-by-default action policy
 - `../config/job-catalog.json` — candidate jobs, explicitly disabled by default
