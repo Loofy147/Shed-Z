@@ -29,13 +29,21 @@ This directory contains the Shed-Z foundation package. The documents describe a 
 - `17-available-resource-inventory.md` — observed capabilities, user-reported constraints and unknowns
 - `18-cost-and-capacity-model.md` — spending approval, benchmark approach, caps and cost formulas
 
+## Preconfiguration
+
+- `19-preconfiguration.md` — deployment-disabled configuration pack and host-binding gate
+- `../config/preconfiguration.json` — host/network/runtime/model/budget placeholders
+- `../config/action-policy.json` — deny-by-default action policy
+- `../config/job-catalog.json` — candidate jobs, explicitly disabled by default
+- `../scripts/validate_preconfiguration.py` — offline guardrail validation
+
 ## Reading order
 
 Start with 01 and 02, then 09, 03 and 04. Read 05–07 for operating, measurement and decision contracts; then 11–15 for system boundaries and feature specs. Use 16–18 to prepare the first pilot, 08 to sequence work and 10 as the release gate.
 
 ## Validation
 
-From the repository root, run `python scripts/check_docs.py`. This checks local Markdown link targets and ensures source IDs in the research findings exist in the source register. It does not verify external URLs, the accuracy of a claim, or implementation state.
+From the repository root, run `python scripts/check_docs.py` and `python scripts/validate_preconfiguration.py`. The first checks local Markdown links and research source IDs. The second checks configuration integrity and safe preconfiguration defaults. Neither verifies external URLs, proves research claims, or tests a deployed runtime.
 
 ## Status
 
