@@ -1,7 +1,7 @@
 # 17 — Available resource and constraint inventory
 
 **Status:** initial inventory; several entries are user-reported or unknown.  
-**Last inspected:** 2026-10-25.
+**Last inspected:** 2026-10-26.
 
 ## Principle
 
@@ -15,7 +15,7 @@ Design around resources that can be verified now. Do not convert a remembered de
 | Documentation validation | Dependency-free Python checker and GitHub Actions workflow exist on the foundation PR branch; one run completed successfully | FACT — CI run observed | Use existing CI to validate docs before introducing a separate runner |
 | PR-based documentation changes | PR #1 exists and is reviewable; it is not merged | FACT — observed | Additional preparation can continue on the same branch; do not describe main as containing the new changes until merged |
 | Operator client | Android phone / Chrome use previously reported by owner | USER_REPORTED | Prefer low-friction review links and commands; remote shell work should not depend on phone-only interaction |
-| Available computer | Prior context reports an Intel i5 7th-generation system with 8 GB RAM and a possible GTX 1080; exact machine identity, GPU presence, free disk, OS and current availability were not independently checked during this repository inspection | USER_REPORTED — unverified | Do not size a runtime or promise local inference from this record. Inspect OS, CPU, RAM, GPU/VRAM, disk, power and uptime first |
+| Available computer | Owner has now confirmed that no computer is currently available for Shed-Z use. Earlier reports mentioned an Intel i5 7th-generation system, 8 GB RAM and a possible GTX 1080, but that hardware is not an available target resource at present. | USER_REPORTED — current availability statement | Keep host-dependent configuration unset. Do not design around the earlier reported specifications, claim local inference capacity, or begin host installation until a target machine is actually available. |
 | Existing local credentials | Not inspected | UNKNOWN / OPEN | Do not copy personal credentials to a worker; confirm whether an isolated service identity is available |
 | Tailscale account / tailnet | Referenced by the AI-shed design; actual owner devices, policies, ACL/grants and device approval not inspected | UNKNOWN / OPEN | Do not presume private remote access has been configured |
 | Cloud VM / always-on host | No provisioned host was confirmed in the inspected repository | UNKNOWN / OPEN | Do not create a paid host until the first jobs and budget are approved |
