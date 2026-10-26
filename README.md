@@ -18,7 +18,8 @@ Shed-Z is an evidence-gated foundation for an always-on, privately reachable age
 - Durable state model for safe recovery
 - Secure instruction-governance strategy
 - Add-on feature catalog and specifications
-- Dependency-free documentation link/source-reference checker and CI workflow
+- Machine-independent preconfiguration, fail-closed action policy and disabled job catalog
+- Offline preconfiguration validator plus documentation validation CI
 
 ## Core logic in one sentence
 
@@ -31,6 +32,8 @@ The available resources are the centre of gravity. Use verified existing capabil
 - `docs/16-workload-inventory.md` — candidate jobs and acceptance criteria
 - `docs/17-available-resource-inventory.md` — observed resources, user-reported constraints and unknowns
 - `docs/18-cost-and-capacity-model.md` — cost formulae, capacity caps and budget approval record
+- `docs/19-preconfiguration.md` — configuration contract, safe defaults and later host-binding steps
+- `config/` — deployment-disabled configuration and action-policy/job templates
 
 These files prepare the decision; they do not claim the target host, private network, provider entitlements or budget are verified. Phase 0 remains open until those facts and the first jobs are confirmed.
 
@@ -61,17 +64,18 @@ These are specifications and role contracts, not claims that separate agents or 
 9. `docs/16-workload-inventory.md`
 10. `docs/17-available-resource-inventory.md`
 11. `docs/18-cost-and-capacity-model.md`
-12. `docs/11-agent-roster.md`
-13. `docs/12-durable-state-model.md`
-14. `docs/13-instruction-governance.md`
-15. `docs/14-addon-features.md`
-16. `docs/15-addon-specifications.md`
-17. `docs/08-roadmap.md`
-18. `docs/10-production-readiness.md`
+12. `docs/19-preconfiguration.md`
+13. `docs/11-agent-roster.md`
+14. `docs/12-durable-state-model.md`
+15. `docs/13-instruction-governance.md`
+16. `docs/14-addon-features.md`
+17. `docs/15-addon-specifications.md`
+18. `docs/08-roadmap.md`
+19. `docs/10-production-readiness.md`
 
 ## Validate documentation
 
-Run `python scripts/check_docs.py` locally. GitHub Actions runs the same dependency-free check on pull requests and pushes to `main`. It checks relative Markdown links and source IDs cited in the research findings. It does not validate external URLs, prove technical claims, or test a deployed runtime.
+Run `python scripts/check_docs.py` and `python scripts/validate_preconfiguration.py` locally. GitHub Actions runs both on pull requests and pushes to `main`. These checks validate local Markdown links, research source IDs and configuration safety defaults. They do not validate external URLs, prove technical claims, or test a deployed runtime.
 
 ## Safety posture
 
