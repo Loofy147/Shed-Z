@@ -15,6 +15,8 @@ The roadmap advances only when the prior phase's exit criteria are met. Dates ar
 - [x] Inventory currently visible resources and preserve unverified constraints as UNKNOWN in `17-available-resource-inventory.md`.
 - [x] Define cost, capacity and approval controls in `18-cost-and-capacity-model.md`.
 - [x] Prepare a deployment-disabled config, fail-closed action policy, disabled job catalog and offline validator in `19-preconfiguration.md` and `config/`.
+- [x] Add six regression tests for the fail-closed promotion and policy rules.
+- [x] Prepare a host-arrival runbook while keeping host-dependent facts unset.
 - [ ] Owner confirms the first two real jobs, output expectations and failure boundaries.
 - [ ] Inspect the actual candidate host, operating system, memory, disk, GPU if present, uptime and recovery access.
 - [ ] Inspect actual remote-access/Tailscale status and access policies before relying on private connectivity.
@@ -23,7 +25,7 @@ The roadmap advances only when the prior phase's exit criteria are met. Dates ar
 
 **Exit gate:** the owner accepts the first two jobs and their safety boundary; the target host and network are identified; the spending ceiling is explicit; acceptance criteria and evidence capture are defined. No runtime is installed just to make the concept feel concrete.
 
-The repository has templates for these inputs, but templates are not evidence that the inputs are complete. Phase 0 remains open until the unchecked owner/environment inputs are supported by evidence.
+The repository has templates and a preconfiguration validator, but templates and a passing validator are not evidence that a host has been secured or that runtime controls are enforced. Phase 0 remains open until the unchecked owner/environment inputs are supported by evidence.
 
 ## Phase 1 — Safe host and remote-access lab
 
